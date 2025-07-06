@@ -627,3 +627,19 @@ config BR2_PACKAGE_SYSTEMD_VMSPAWN
 	  https://www.freedesktop.org/software/systemd/man/systemd-vmspawn.html
 
 endif
+
+config BR2_PACKAGE_SYSTEMD_STUB
+	bool
+	depends on BR2_PACKAGE_SYSTEMD
+	depends on BR2_PACKAGE_GNU_EFI_ARCH_SUPPORTS
+	select BR2_PACKAGE_GNU_EFI
+	select BR2_PACKAGE_HOST_PYTHON3
+
+
+config BR2_PACKAGE_SYSTEMD_STUB_EFI_ARCH
+	string
+	default "ia32"  if BR2_i386
+	default "x64"   if BR2_x86_64
+	default "aa64"  if BR2_aarch64
+	default "riscv" if BR2_riscv
+	depends on BR2_PACKAGE_SYSTEMD_STUB
