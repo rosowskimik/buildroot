@@ -103,7 +103,6 @@ SYSTEMD_CONF_OPTS += \
 	-Dlog-message-verification=disabled \
 	-Dsysupdated=disabled \
 	-Dtmpfiles=true \
-	-Dukify=disabled \
 	-Dbpf-framework=disabled \
 	-Dvmlinux-h=disabled \
 	-Dumount-path=/usr/bin/umount \
@@ -656,10 +655,19 @@ define SYSTEMD_INSTALL_BOOT_FILES
 	$(INSTALL) -D -m 0644 $(SYSTEMD_PKGDIR)/boot-files/buildroot.conf \
 		$(BINARIES_DIR)/efi-part/loader/entries/buildroot.conf
 endef
+else ifeq ($(BR2_PACKAGE_SYSTEMD_STUB),y)
+SYSTEMD_INSTALL_IMAGES = YES
+SYSTEMD_DEPENDENCIES += gnu-efi host-python-pyelftools
+SYSTEMD_CONF_OPTS += -Dbootloader=enabled
 
+SYSTEMD_STUB_EFI_ARCH = $(call qstrip,$(BR2_PACKAGE_SYSTEMD_STUB_EFI_ARCH))
+define SYSTEMD_INSTALL_STUB_FILE
+	$(INSTALL) -D -m 0644 $(@D)/buildroot-build/src/boot/efi/linux$(SYSTEMD_STUB_EFI_ARCH).efi.stub \
+		$(BINARIES_DIR)/sd-stub.efi
+endef
 else
 SYSTEMD_CONF_OPTS += -Dbootloader=disabled
-endif # BR2_PACKAGE_SYSTEMD_BOOT == y
+endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_EFI),y)
 SYSTEMD_CONF_OPTS += -Defi=true
@@ -690,6 +698,7 @@ SYSTEMD_POST_INSTALL_TARGET_HOOKS += \
 
 define SYSTEMD_INSTALL_IMAGES_CMDS
 	$(SYSTEMD_INSTALL_BOOT_FILES)
+	$(SYSTEMD_INSTALL_STUB_FILE)
 endef
 
 define SYSTEMD_PERMISSIONS
@@ -1027,6 +1036,13 @@ HOST_SYSTEMD_DEPENDENCIES = \
 	host-python-jinja2
 
 HOST_SYSTEMD_NINJA_ENV = DESTDIR=$(HOST_DIR)
+
+ifeq ($(BR2_PACKAGE_HOST_SYSTEMD_UKIFY),y)
+HOST_SYSTEMD_DEPENDENCIES += host-python-pefile
+HOST_SYSTEMD_CONF_OPTS += -Dukify=enabled
+else
+HOST_SYSTEMD_CONF_OPTS += -Dukify=disabled
+endif # BR2_PACKAGE_HOST_SYSTEMD_UKIFY
 
 # Fix RPATH After installation
 # * systemd provides a install_rpath instruction to meson because the binaries
