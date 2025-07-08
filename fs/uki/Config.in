@@ -1,0 +1,42 @@
+config BR2_TARGET_ROOTFS_UKI
+	bool "unified kernel image"
+	depends on BR2_PACKAGE_SYSTEMD
+	depends on BR2_PACKAGE_GNU_EFI_ARCH_SUPPORTS
+	depends on BR2_LINUX_KERNEL
+	select BR2_PACKAGE_HOST_SYSTEMD_UKIFY
+	select BR2_PACKAGE_SYSTEMD_STUB
+	select BR2_TARGET_ROOTFS_CPIO
+	select BR2_PACKAGE_HOST_IMAGEMAGICK if BR2_TARGET_ROOTFS_UKI_SPLASH_IMAGE != ""
+	help
+	  Unified Kernel Image
+
+comment "UKI needs a Linux kernel to be built"
+	depends on !BR2_LINUX_KERNEL
+
+if BR2_TARGET_ROOTFS_UKI
+
+config BR2_TARGET_ROOTFS_UKI_CMDLINE_FILE
+	string "Kernel cmdline file"
+	help
+	  Path to a file containing kernel command line arguments
+
+config BR2_TARGET_ROOTFS_UKI_CMDLINE
+	string "Additional kernel cmdline arguments"
+	help
+	  Additional kernel cmdline arguments, which will be appended to
+	  cmdline file
+
+config BR2_TARGET_ROOTFS_UKI_SPLASH_IMAGE
+	string "Splash image path"
+	help
+	  Path to splash image to be embedded in the UKI
+
+config BR2_TARGET_ROOTFS_UKI_DEVICETREE
+	bool
+	default y if BR2_LINUX_KERNEL_DTS_SUPPORT
+
+config BR2_TARGET_ROOTFS_UKI_NEED_ZBOOT
+	bool
+	default y if (BR2_aarch64 || BR2_riscv)
+
+endif # BR2_TARGET_ROOTFS_UKI
