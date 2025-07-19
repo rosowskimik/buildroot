@@ -19,7 +19,6 @@ WESTON_DEPENDENCIES = host-pkgconf wayland wayland-protocols \
 WESTON_CONF_OPTS = \
 	-Ddoc=false \
 	-Dremoting=false \
-	-Dbackend-vnc=false \
 	-Dtools=calibrator,debug,info,terminal,touch-calibrator
 
 ifeq ($(BR2_PACKAGE_WESTON_SIMPLE_CLIENTS),y)
@@ -95,6 +94,13 @@ ifeq ($(BR2_PACKAGE_WESTON_WAYLAND),y)
 WESTON_CONF_OPTS += -Dbackend-wayland=true
 else
 WESTON_CONF_OPTS += -Dbackend-wayland=false
+endif
+
+ifeq ($(BR2_PACKAGE_WESTON_VNC),y)
+WESTON_CONF_OPTS += -Dbackend-vnc=true
+WESTON_DEPENDENCIES += neatvnc linux-pam
+else
+WESTON_CONF_OPTS += -Dbackend-vnc=false
 endif
 
 ifeq ($(BR2_PACKAGE_WESTON_X11),y)
