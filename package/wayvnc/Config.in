@@ -1,0 +1,13 @@
+config BR2_PACKAGE_WAYVNC
+    bool "wayvnc"
+    select BR2_PACKAGE_AML
+    select BR2_PACKAGE_LIBDRM
+    select BR2_PACKAGE_LIBXKBCOMMON
+    select BR2_PACKAGE_NEATVNC
+    select BR2_PACKAGE_PIXMAN
+    select BR2_PACKAGE_JANSSON
+    select BR2_PACKAGE_WAYLAND
+    help
+        A VNC server for wlroots based Wayland compositors
+
+        https://github.com/any1/wayvnc
